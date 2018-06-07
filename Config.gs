@@ -19,23 +19,28 @@
 // Configuration
 // =============
 
-var SCRIPT_NAME = "Promotion Request Responses"
-var SCRIPT_VERSION = "v0.dev_ajr"
+var SCRIPT_NAME = "Promotion Request Responses";
+var SCRIPT_VERSION = "v0.dev_ajr";
 
-var PRODUCTION_VERSION_ = false
+var PRODUCTION_VERSION_ = false;
 
 // Log Library
 // -----------
 
-var DEBUG_LOG_LEVEL_ = PRODUCTION_VERSION_ ? BBLog.Level.INFO : BBLog.Level.FINER
-var DEBUG_LOG_DISPLAY_FUNCTION_NAMES_ = PRODUCTION_VERSION_ ? BBLog.DisplayFunctionNames.NO : BBLog.DisplayFunctionNames.YES
+var DEBUG_LOG_LEVEL_ = PRODUCTION_VERSION_ ? BBLog.Level.INFO : BBLog.Level.FINER;
+var DEBUG_LOG_DISPLAY_FUNCTION_NAMES_ = PRODUCTION_VERSION_ ? BBLog.DisplayFunctionNames.NO : BBLog.DisplayFunctionNames.YES;
 
 // Assert library
 // --------------
 
-var SEND_ERROR_EMAIL_ = PRODUCTION_VERSION_ ? true : false
-var HANDLE_ERROR_ = Assert.HandleError.THROW
-var ADMIN_EMAIL_ADDRESS_ = 'andrewr1969@gmail.com'
+var SEND_ERROR_EMAIL_ = PRODUCTION_VERSION_ ? true : false;
+var HANDLE_ERROR_ = Assert.HandleError.THROW;
+var ADMIN_EMAIL_ADDRESS_ = 'andrewr1969@gmail.com';
+
+// Tests
+// -----
+
+var TEST_SPREADSHEET_ID = '1v01QwQXozH79JXOSNdmTTf1P4Utt_SPOsBa-2SZPIx0';
 
 // Constants/Enums
 // ===============
@@ -43,7 +48,8 @@ var ADMIN_EMAIL_ADDRESS_ = 'andrewr1969@gmail.com'
 var config = {
 
   files : {
-    masterAnnouncementsID : '',
+//    masterAnnouncementsID : '', // Master Sunday Announcements
+    masterAnnouncementsID : '1qcVEd-Dw5KRrLxv-EyV5zWIseeUwYbwt9kcSMKI2LMo', // Test Copy of Master Sunday Announcements (andrewr)
   },
 
 //  changeLog : {
@@ -116,7 +122,7 @@ var config = {
 /* 
 function functionTemplate() {
 
-  Log_.functionEntryPoint()
+  Log_.functionEntryPoint();
   
   
 

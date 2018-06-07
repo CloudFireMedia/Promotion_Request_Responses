@@ -17,9 +17,19 @@ var Sync_ = (function(ns) {
   ns.syncRowToMaster = function() {
   
     var spreadsheet = SpreadsheetApp.getActive();
+    
+    if (spreadsheet === null && !PRODUCTION_VERSION_) {
+      spreadsheet = SpreadsheetApp.openById(TEST_SPREADSHEET_ID)
+    }
+    
     config.columns = Utils.getPRFColumns(spreadsheet);
     
     var activeRange = SpreadsheetApp.getActiveRange();
+    
+    if (activeRange === null && !PRODUCTION_VERSION_) {
+      activeRange = spreadsheet.getSheetByName(config.dataSheetName).getRange('A3')
+    }
+    
     var sheet = activeRange.getSheet();
     var range = sheet.getRange(activeRange.getRow(), 1, 1, sheet.getLastColumn());
     
@@ -38,7 +48,7 @@ var Sync_ = (function(ns) {
     }
      
     // clear the update field 
-    range.offset(0, config.columns.update - 1, 1, 1).setValue(null);
+    sheet.getRange(range.getRow(), config.columns.Update).setValue(null);
     
     syncToMaster(range);
     
@@ -47,6 +57,11 @@ var Sync_ = (function(ns) {
   ns.syncAllToMaster = function() {
   
     var spreadsheet = SpreadsheetApp.getActive();
+    
+    if (spreadsheet === null & !PRODUCTION_VERSION_) {
+      spreadsheet = SpreadsheetApp.openById(TEST_SPREADSHEET_ID)
+    }
+        
     config.columns = Utils.getPRFColumns(spreadsheet);
     
     var sheet = SpreadsheetApp.getActiveSheet();
@@ -105,15 +120,20 @@ var Sync_ = (function(ns) {
   function syncToMaster(range){
   
     var spreadsheet = SpreadsheetApp.getActive();
+    
+    if (spreadsheet === null & !PRODUCTION_VERSION_) {
+      spreadsheet = SpreadsheetApp.openById(TEST_SPREADSHEET_ID)
+    }
+        
     config.columns = Utils.getPRFColumns(spreadsheet);
     
     var values = range.getValues()[0];
     
-    if (!values.length) {
+    if (values.length === 0) {
       throw new Error ('Missing data');
     }
     
-    var eventDate = values[config.columns.startDate - 1];//EVENT START DATE / TIME
+    var eventDate = values[config.columns.StartDate - 1];//EVENT START DATE / TIME
     var shortDate = Utilities.formatDate(eventDate, 0, "MM.dd");
     var formatedStringDate = Utils.getFormatedDateForEvent(eventDate);
     var rowNumberToWork = Utilities.formatString("Row %s", range.getRow());
@@ -121,7 +141,7 @@ var Sync_ = (function(ns) {
     var makePara = Utilities.formatString(
       //'[ EVENT TITLE | Gold Row 4 | YOUR NAME ] 03.11; WHAT IS THIS EVENT ALL ABOUT?\\n >> Sunday, March 11 at 5:00pm at EVENT LOCATION; Register by EVENT REGISTRATION; Cost is EVENT COST'
       '[ %s | %s | %s ] %s; %s\n >> %s at %s; Register by %s; Cost is %s', 
-      values[config.columns.title -1] || 'x',//Barefoot Republic
+      values[config.columns.Title -1] || 'x',//Barefoot Republic
       rowNumberToWork,//Row 3
       values[config.columns.name -1] || '?',//Chad Barlow
       shortDate || 'x',//Mon Jun 18 2018 09:00:00 GMT-0400 (EDT); 
@@ -140,7 +160,7 @@ var Sync_ = (function(ns) {
     
     // get event dates
     // promoStartDate is the latter of the earliest start date and the eventPromoStartDate (calcuated from the config.deadline weeks)
-    var eventPromoStartDate = Utils.dateAdd(Utils.getUpcomingSunday(eventDate), 'week', -1 * config.deadline[values[config.columns.tier-1].toUpperCase()])//cryptic much?
+    var eventPromoStartDate = Utils.dateAdd(Utils.getUpcomingSunday(eventDate), 'week', -1 * config.deadline[values[config.columns.tier-1].toUpperCase()])
     var minimumPromoStartDate = Utils.dateAdd(Utils.getUpcomingSunday(new Date()), 'week', 3);//3 weeks from Sunday
     var promoStartDate = (eventPromoStartDate.getTime() < minimumPromoStartDate.getTime()) ? minimumPromoStartDate : eventPromoStartDate;
     var promoEndDate = Utils.dateAdd(Utils.getUpcomingSunday(eventDate), 'week', -1)
@@ -184,7 +204,7 @@ var Sync_ = (function(ns) {
      
     // add event to all pages between fromOffset and toOffset
     
-    for(var x=toOffset; x<fromOffset+1; x++) {
+    for (var x=toOffset; x<fromOffset+1; x++) {
     
       var elem = body.getChild(x);
       

@@ -5,8 +5,8 @@
 
 (function() {"use strict"})()
 
-// GasTemplate.gs
-// ==============
+// PromotionRequestResponses.gs
+// ============================
 //
 // External interface to this script - all of the event handlers.
 //
