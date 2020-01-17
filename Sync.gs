@@ -167,7 +167,8 @@ function syncToMaster_(range){//range should be one or more full rows
   if(! values.length) throw 'Missing data'
   
   var eventDate = values[CONFIG_.columns.startDate -1] //EVENT START DATE / TIME
-  var shortDate = Utilities.formatDate(eventDate, 0, "MM.dd")
+  var timeZone = Session.getScriptTimeZone()
+  var shortDate = Utilities.formatDate(eventDate, timeZone, "MM.dd")
   var formatedStringDate = Utils.getFormatedDateForEvent(eventDate)
   var rowNumberToWork = Utilities.formatString("Row %s", range.getRow())
   
