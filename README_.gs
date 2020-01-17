@@ -8,3 +8,8 @@
 // ----
 //
 // * First version
+
+// v1.1
+// ----
+//
+// * Adding syncAllToMaster menu item
