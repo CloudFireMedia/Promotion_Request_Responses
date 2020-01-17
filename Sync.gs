@@ -4,7 +4,7 @@
 function syncRowToMaster_(){
   
   Log_.functionEntryPoint()
-  getPRFColumns_();//populate CONFIG_.columns
+  mapPRFColumns_();//populate CONFIG_.columns
   var activeRange = SpreadsheetApp.getActiveRange()
   var sheet = activeRange.getSheet()
   var range = sheet.getRange(activeRange.getRow(), 1, 1, sheet.getLastColumn())  
@@ -52,7 +52,7 @@ function syncRowToMaster_(){
 function syncAllToMaster_(){
   
   Log_.functionEntryPoint()
-  getPRFColumns_() //populate CONFIG_.columns
+  mapPRFColumns_() //populate CONFIG_.columns
   var sheet = SpreadsheetApp.getActiveSheet()
   if(sheet.getName() !== CONFIG_.dataSheetName){
     SpreadsheetApp.getActive().getSheetByName(CONFIG_.dataSheetName).activate()
@@ -74,7 +74,7 @@ function syncAllToMaster_(){
     Utilities.sleep(300) //visual pause
     
     switch(action){
-      case '➕': syncToMaster(rowRange); break
+      case '➕': syncToMaster_(rowRange); break
       case '❎': 
         var text = Utilities.formatString("\\| Row %s \\|", rowRange.getRow())
         removeFromMaster_(text)
@@ -87,23 +87,17 @@ function syncAllToMaster_(){
   }
 }
 
-function getPRFColumns_(){
+function mapPRFColumns_(){
   
   Log_.functionEntryPoint()
   
-  var ss = SpreadsheetApp.openById(Config.get('PROMOTION_FORM_RESPONSES_GSHEET_ID'))
+  var ss = SpreadsheetApp.getActive()
   var responseSheet = ss.getSheetByName(CONFIG_.dataSheetName)
   if ( ! responseSheet) throw 'Unable to find sheet named "'+CONFIG_.dataSheetName+'".'
   
-  var namedRanges = ss.getNamedRanges()
-    
   var cols = {}
-  for (var n in namedRanges){
-    var namedRange = namedRanges[n]
-    if(namedRange.getRange().getRow()==2){
-      cols[namedRange.getName()] = namedRange.getRange().getColumn()
-    }
-  }
+  
+  cols = Utils.getPRFColumns(ss)
   
   //now assign them to existing config vars
   CONFIG_.columns.cost                  = cols.EventCost
@@ -135,9 +129,9 @@ function getTierDueDate_(tierValue){
   
   Log_.functionEntryPoint()
   
-  var dueDateDay = null
+  var dueDateWeek = null
   var liveAnnouncementDate = null
-  var ss = SpreadsheetApp.openById(Config.get('PROMOTION_FORM_RESPONSES_GSHEET_ID'))
+  var ss = SpreadsheetApp.getActive()
   var tierDueDateSheet = ss.getSheetByName(CONFIG_.tierDueDateSheetName)
   var foundTier = false
   if ( ! tierDueDateSheet) throw 'Unable to find sheet named "'+CONFIG_.tierDueDateSheetName+'".'
@@ -146,10 +140,10 @@ function getTierDueDate_(tierValue){
 
   for (var n in tierData) {
     if (tierData[n][CONFIG_.lookup.tierName-1].toUpperCase() === tierValue) {
-      dueDateDay = tierData[n][CONFIG_.lookup.dueDate-1]
+      dueDateWeek = tierData[n][CONFIG_.lookup.dueDate-1]
       liveAnnouncementDate = tierData[n][CONFIG_.lookup.liveAnnouncementDate-1]
       Log_.fine('Tier: ' + tierValue)
-      Log_.fine('Due Date: ' + dueDateDay)
+      Log_.fine('Due Date: ' + dueDateWeek)
       Log_.fine('Live Announcement Date: ' + liveAnnouncementDate)
       foundTier = true
     }    
@@ -159,7 +153,7 @@ function getTierDueDate_(tierValue){
     throw new Error('Bad Tier Name')
   }
     
-  return [dueDateDay, liveAnnouncementDate]
+  return [dueDateWeek, liveAnnouncementDate]
 } //getTierDueDate_
 
 function syncToMaster_(range){//range should be one or more full rows
@@ -167,14 +161,14 @@ function syncToMaster_(range){//range should be one or more full rows
   Log_.functionEntryPoint()
   
   //populate CONFIG_.columns
-  getPRFColumns_()
+  mapPRFColumns_()
 
   var values = range.getValues()[0]
   if(! values.length) throw 'Missing data'
   
   var eventDate = values[CONFIG_.columns.startDate -1] //EVENT START DATE / TIME
   var shortDate = Utilities.formatDate(eventDate, 0, "MM.dd")
-  var formatedStringDate = getFormatedDateForEvent_(eventDate)
+  var formatedStringDate = Utils.getFormatedDateForEvent(eventDate)
   var rowNumberToWork = Utilities.formatString("Row %s", range.getRow())
   
   var makePara = Utilities.formatString(
@@ -200,30 +194,30 @@ function syncToMaster_(range){//range should be one or more full rows
   
   //get event dates
   //promoStartDate is the earliest of the minimum start date and the eventPromoStartDate (calcuated from the Lookup: Tier Due Dates sheet)
-  var [dueDateDay, liveAnnouncementDate] = getTierDueDate_(values[CONFIG_.columns.tier-1])
+  var [dueDateWeek, liveAnnouncementDate] = getTierDueDate_(values[CONFIG_.columns.tier-1])
   
   //get upcoming sunday to event date
-  var upcomingSunday = getUpcomingSunday_(eventDate)
+  var upcomingSunday = Utils.getUpcomingSunday(eventDate)
     
   //if the closest sunday is the date of the event, take 1 of the liveAnnouncementDate
   if (upcomingSunday.getTime() === eventDate.getTime()) {
     Log_.fine('minus liveAnnouncement')
     liveAnnouncementDate -= 1
   }
-  var eventPromoStartDate = dateAdd_(upcomingSunday, 'week', -1 * liveAnnouncementDate)
-  var minimumPromoStartDate = dateAdd_(upcomingSunday, 'week', -1);//2 weeks from Sunday (3 due -1 Back up)
+  var eventPromoStartDate = Utils.dateAdd(upcomingSunday, 'week', -1 * liveAnnouncementDate)
+  var minimumPromoStartDate = Utils.dateAdd(upcomingSunday, 'week', -1);//2 weeks from Sunday (3 due -1 Back up)
   var promoStartDate = eventPromoStartDate.getTime() > minimumPromoStartDate.getTime() ? minimumPromoStartDate : eventPromoStartDate
   
   //if the event start date is a sunday, use this as the end date, otherwise use the sunday previous to the event start
-  var promoEndDate = upcomingSunday.getTime() === eventDate.getTime() ? eventDate : dateAdd_(upcomingSunday, 'week', -1)
+  var promoEndDate = upcomingSunday.getTime() === eventDate.getTime() ? eventDate : Utils.dateAdd(upcomingSunday, 'week', -1)
 
-  var stringFromFind = fDate_(promoStartDate, "'[' MM.dd '] Sunday Announcements'")
-  var stringToFind   = fDate_(promoEndDate,   "'[' MM.dd '] Sunday Announcements'")
+  var stringFromFind = Utils.fDate(promoStartDate, "'[' MM.dd '] Sunday Announcements'")
+  var stringToFind   = Utils.fDate(promoEndDate,   "'[' MM.dd '] Sunday Announcements'")
   var rowNumber = range.getRow()
   
   Log_.fine('upcomingSunday: '+upcomingSunday)
   Log_.fine('liveAnnouncementDate: '+liveAnnouncementDate)
-  Log_.fine('dueDateDay: '+dueDateDay)
+  Log_.fine('dueDateWeek: '+dueDateWeek)
   Log_.fine('eventPromoStartDate: '+eventPromoStartDate)
   Log_.fine('promoEndDate: '+promoEndDate)
   Log_.fine('stringFromFind: '+stringFromFind)
@@ -240,7 +234,8 @@ function removeFromMaster_(text){
   
   Log_.functionEntryPoint()
   
-  var body = getMasterBody_()
+  var masterId = Config.get('ANNOUNCEMENTS_MASTER_SUNDAY_ID')
+  var body = Utils.getMasterBody(masterId)
   var searchText = text
   Log_.fine('searchText: '+searchText)
   var counter = 0
@@ -267,15 +262,16 @@ function addEventToMaster_(stringToFind, stringFromFind, makePara, makeParaForSu
   /*
   IMPORTANT: If Master does not have pages for the event date in question, the event is skipped.
   */
-  var body = getMasterBody_()
+  var masterId = Config.get('ANNOUNCEMENTS_MASTER_SUNDAY_ID')
+  var body = Utils.getMasterBody(masterId)
   
   //remove existing paragraph if found
   var searchText = Utilities.formatString("\\| Row %s \\|", rowNumber) //like: "| Row 4 |"
   removeFromMaster_(searchText) //removes any paragraph with the matching row identifier (the searchtext)
   
   //Master is in reverse order thus fromOffset > toOffset (when from and to are date-centric)
-  var fromOffset = searchInMaster_(stringFromFind) //last match in document order, last in date sequence
-  var toOffset   = searchInMaster_(stringToFind) //first match in document order, first in date sequence
+  var fromOffset = Utils.searchInMaster(masterId, stringFromFind) //last match in document order, last in date sequence
+  var toOffset   = Utils.searchInMaster(masterId, stringToFind) //first match in document order, first in date sequence
   
   Log_.fine('addEventToMaster fromOffset: '+fromOffset)
   Log_.fine('addEventToMaster toOffset: '+toOffset)

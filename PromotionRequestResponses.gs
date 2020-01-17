@@ -38,22 +38,11 @@ var EVENT_HANDLERS_ = {
 //                           ----                            ---------------                          ------------------
 
   syncRowToMaster: ['syncRowToMaster()', 'Failed to sync row to master',    syncRowToMaster_],
-//  syncAllToMaster: ['syncAllToMaster()', 'Failed to sync all to master',    syncAllToMaster_],
-//  updateEventsPromotionCalendarMatchingEvents_TEST: ['updateEventsPromotionCalendarMatchingEvents_TEST()', 'Failed to Update Events test',    updateEventsPromotionCalendarMatchingEvents_TEST_],
-//  updateEventsPromotionCalendarMatchingEvents: ['updateEventsPromotionCalendarMatchingEvents()', 'Failed to sync Update Events',    updateEventsPromotionCalendarMatchingEvents_],
-//  showInstructions_MatchEvent: ['showInstructions_MatchEvent()', 'Failed to show Instruction',    showInstructions_MatchEvent_],
-//  setupAutomation:   ['setupAutomation()', 'Failed to setup Automation',    setupAutomation_],
-//  disableAutomation: ['disableAutomation()', 'Failed to disable Automation',    disableAutomation_],
-    
+  syncAllToMaster: ['syncAllToMaster()', 'Failed to sync all to master',    syncAllToMaster_],    
 }
 
 function syncRowToMaster(args) {return eventHandler_(EVENT_HANDLERS_.syncRowToMaster, args)}
-//function syncAllToMaster(args) {return eventHandler_(EVENT_HANDLERS_.syncRowToMaster, args)}
-//function updateEventsPromotionCalendarMatchingEvents_TEST(args) {return eventHandler_(EVENT_HANDLERS_.syncRowToMaster, args)}
-//function updateEventsPromotionCalendarMatchingEvents(args) {return eventHandler_(EVENT_HANDLERS_.syncRowToMaster, args)}
-//function showInstructions_MatchEvent(args) {return eventHandler_(EVENT_HANDLERS_.syncRowToMaster, args)}
-//function setupAutomation(args) {return eventHandler_(EVENT_HANDLERS_.setupAutomation, args)}
-//function disableAutomation(args) {return eventHandler_(EVENT_HANDLERS_.disableAutomation, args)}
+function syncAllToMaster(args) {return eventHandler_(EVENT_HANDLERS_.syncAllToMaster, args)}
 
 // Private Functions
 // =================
