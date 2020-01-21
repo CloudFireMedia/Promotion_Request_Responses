@@ -71,7 +71,6 @@ function syncAllToMaster_(){
     //provide visual evidence of progress
     rowRange.setBorder(true, true, true, true, false, false, '#ffdd00', SpreadsheetApp.BorderStyle.SOLID_THICK)
     SpreadsheetApp.flush()
-    Utilities.sleep(300) //visual pause
     
     switch(action){
       case '➕': syncToMaster_(rowRange); break
