@@ -1,15 +1,19 @@
-// 34567890123456789012345678901234567890123456789012345678901234567890123456789
 
 // README
 // ======
 //
 
-// v1.0
+// v1.2
 // ----
 //
-// * First version
+// * Added formatIncomingDataSheet()
 
 // v1.1
 // ----
 //
-// * Adding syncAllToMaster menu item
+// * Added syncAllToMaster menu item
+
+// v1.0
+// ----
+//
+// * First version
