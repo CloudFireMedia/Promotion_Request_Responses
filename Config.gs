@@ -19,7 +19,7 @@
 // =============
 
 var SCRIPT_NAME_ = "PromotionRequestResponses"
-var SCRIPT_VERSION_ = "v1.1"
+var SCRIPT_VERSION_ = "v1.2"
 
 var PRODUCTION_VERSION_ = true
 

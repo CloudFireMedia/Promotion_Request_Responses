@@ -34,15 +34,17 @@ var Log_
 
 var EVENT_HANDLERS_ = {
 
-//                           Name                            onError Message                          Main Functionality
-//                           ----                            ---------------                          ------------------
+//                           Name                  onError Message                  Main Functionality
+//                           ----                  ---------------                  ------------------
 
-  syncRowToMaster: ['syncRowToMaster()', 'Failed to sync row to master',    syncRowToMaster_],
-  syncAllToMaster: ['syncAllToMaster()', 'Failed to sync all to master',    syncAllToMaster_],    
+  syncRowToMaster:           ['syncRowToMaster()', 'Failed to sync row to master',  syncRowToMaster_],
+  syncAllToMaster:           ['syncAllToMaster()', 'Failed to sync all to master',  syncAllToMaster_],    
+  formatIncomingDataSheet:   ['syncAllToMaster()', 'Failed to format',              formatIncomingDataSheet_],    
 }
 
 function syncRowToMaster(args) {return eventHandler_(EVENT_HANDLERS_.syncRowToMaster, args)}
 function syncAllToMaster(args) {return eventHandler_(EVENT_HANDLERS_.syncAllToMaster, args)}
+function formatIncomingDataSheet(args) {return eventHandler_(EVENT_HANDLERS_.formatIncomingDataSheet, args)}
 
 // Private Functions
 // =================
